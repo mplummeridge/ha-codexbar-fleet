@@ -1,0 +1,33 @@
+blueprint:
+  name: CodexBar Fleet problem notification
+  description: Run notification actions when the CodexBar Fleet problem sensor remains on.
+  domain: automation
+  input:
+    problem_sensor:
+      name: Fleet problem sensor
+      selector:
+        entity:
+          filter:
+            - domain: binary_sensor
+    duration:
+      name: Problem duration
+      default:
+        minutes: 2
+      selector:
+        duration:
+    notification_actions:
+      name: Notification actions
+      selector:
+        action:
+
+triggers:
+  - trigger: state
+    entity_id: !input problem_sensor
+    to: "on"
+    for: !input duration
+
+conditions: []
+
+actions: !input notification_actions
+
+mode: single

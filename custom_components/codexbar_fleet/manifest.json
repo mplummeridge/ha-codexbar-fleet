@@ -1,0 +1,20 @@
+{
+  "domain": "codexbar_fleet",
+  "name": "CodexBar Fleet",
+  "codeowners": [
+    "@marvin"
+  ],
+  "config_flow": true,
+  "dependencies": [
+    "mqtt"
+  ],
+  "documentation": "https://github.com/mmv3/codexbar-ha",
+  "integration_type": "service",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/mmv3/codexbar-ha/issues",
+  "requirements": [],
+  "version": "0.2.0",
+  "mqtt": [
+    "codexbar/discovery/v1/+/+"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "title": "CodexBar Fleet",
+  "config": {
+    "step": {
+      "mqtt": {
+        "title": "CodexBar Fleet discovered"
+      },
+      "discovery_confirm": {
+        "title": "Set up discovered CodexBar Fleet",
+        "description": "{machine} announced fleet {fleet_id} using MQTT prefix {topic_prefix}. Machines and accounts will be discovered automatically."
+      },
+      "user": {
+        "title": "Connect a CodexBar MQTT fleet manually",
+        "description": "Normally CodexBar Fleet appears automatically from an agent discovery beacon. Use this fallback for a legacy agent or a broker ACL that blocks codexbar/discovery/v1/#.",
+        "data": {
+          "topic_prefix": "MQTT topic prefix"
+        }
+      }
+    },
+    "error": {
+      "invalid_topic_prefix": "Enter a non-empty MQTT topic prefix without wildcards"
+    },
+    "abort": {
+      "already_configured": "This MQTT topic prefix is already configured",
+      "fleet_already_configured": "This CodexBar fleet is already configured",
+      "invalid_discovery_info": "The MQTT discovery beacon is invalid or incompatible",
+      "mqtt_required": "Set up the Home Assistant MQTT integration first"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Aggregation policy",
+        "description": "Machines and accounts are learned automatically. Expected machines is an optional comma-separated pinned membership list for completeness alarms. Cost attribution remains conservative: historical backfills, long gaps, missing brackets and account changes are never silently assigned to an account.",
+        "data": {
+          "expected_machines": "Pinned expected machine IDs (optional)",
+          "stale_after_seconds": "Machine stale after (seconds)",
+          "cycle_timeout_seconds": "Cost-cycle timeout (seconds)",
+          "max_attribution_gap_seconds": "Maximum attributable polling gap (seconds)",
+          "account_change_confirmations": "Account-change confirmations",
+          "retention_days": "Aggregation retention (days)",
+          "low_quota_threshold": "Low-quota threshold (%)",
+          "low_coverage_threshold": "Low-attribution coverage threshold (%)",
+          "max_payload_bytes": "Maximum MQTT payload size (bytes)",
+          "enable_verbose_entities": "Create verbose per-service and per-model entities"
+        }
+      }
+    }
+  }
+}
