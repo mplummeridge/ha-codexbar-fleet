@@ -2,13 +2,7 @@
 
 A native Home Assistant custom integration for aggregating CodexBar telemetry from multiple Macs through MQTT.
 
-This repo contains:
-
-- `custom_components/codexbar_fleet/` — HACS-installable Home Assistant integration.
-- `dist/` — macOS `codexbar-mqtt` agent release archives used by each Mac.
-- `blueprints/` — optional Home Assistant automation blueprint.
-- `dashboards/` — example dashboard notes.
-- `docs/` — architecture, entity model, operations, and verification notes.
+This repo contains the HACS-installable Home Assistant integration only. The macOS collector lives in [`mplummeridge/codexbar-mqtt`](https://github.com/mplummeridge/codexbar-mqtt).
 
 ## What it does
 
@@ -30,34 +24,23 @@ Core semantics:
 4. Restart Home Assistant.
 5. Run at least one Mac agent. A retained discovery beacon should make **CodexBar Fleet discovered** appear under Settings → Devices & services.
 
+Custom repository URL:
+
+```text
+https://github.com/mplummeridge/ha-codexbar-fleet
+```
+
 The integration also supports manual fallback setup if MQTT discovery beacons are blocked by ACLs.
 
 ## Mac agent
 
-Download the matching archive from `dist/` or from GitHub Releases if you publish these files as release assets:
+Install the collector from:
 
-```bash
-tar -xzf dist/codexbar-mqtt-0.2.0-darwin-arm64.tar.gz
-cd codexbar-mqtt-0.2.0-darwin-arm64
-
-MQTT_BROKER='mqtt://homeassistant.local:1883' \
-MQTT_USERNAME='codexbar' \
-MACHINE_ID='macbook-m4' \
-./scripts/install.sh
+```text
+https://github.com/mplummeridge/codexbar-mqtt
 ```
 
-Then set the password:
-
-```bash
-printf '%s' 'MQTT_PASSWORD' > \
-  "$HOME/Library/Application Support/codexbar-mqtt/mqtt-password"
-
-"$HOME/Library/Application Support/codexbar-mqtt/bin/codexbar-mqtt" \
-  doctor \
-  --config "$HOME/Library/Application Support/codexbar-mqtt/config.json"
-```
-
-MQTT ACLs must allow agent writes to:
+The agent publishes to:
 
 ```text
 codexbar/discovery/v1/#
@@ -68,10 +51,9 @@ codexbar/v1/#
 
 ```text
 custom_components/codexbar_fleet/  # HA integration
-dist/                              # macOS agent release artifacts
-blueprints/automation/             # optional automations
-dashboards/                        # example dashboard notes
-docs/                              # deeper design/ops docs
+docs/                              # design/ops notes
+.github/workflows/                 # validation and optional release packaging
+hacs.json                          # HACS metadata
 ```
 
 ## Development
@@ -80,4 +62,4 @@ This is a custom integration, not a normal MQTT Discovery entity pack. That is i
 
 ## License
 
-No open-source license has been selected in this generated package. Add a `LICENSE` file before publishing publicly if you want others to reuse the code.
+No open-source license has been selected yet. Add a `LICENSE` file before publishing broadly if you want others to reuse the code.
