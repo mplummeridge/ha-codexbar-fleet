@@ -34,10 +34,10 @@ DEFAULT_MAX_PAYLOAD_BYTES = 8 * 1024 * 1024
 DEFAULT_ENABLE_VERBOSE_ENTITIES = False
 
 DISCOVERY_ROOT = "codexbar/discovery/v1"
-DISCOVERY_SCHEMA = "dev.mmv3.codexbar-mqtt.discovery.v1"
-OBSERVATION_SCHEMA = "dev.mmv3.codexbar-mqtt.observation.v1"
-NODE_META_SCHEMA = "dev.mmv3.codexbar-mqtt.node-meta.v1"
-HEARTBEAT_SCHEMA = "dev.mmv3.codexbar-mqtt.heartbeat.v1"
+DISCOVERY_SCHEMA = "io.github.mplummeridge.codexbar_mqtt.discovery.v1"
+OBSERVATION_SCHEMA = "io.github.mplummeridge.codexbar_mqtt.observation.v1"
+NODE_META_SCHEMA = "io.github.mplummeridge.codexbar_mqtt.node_meta.v1"
+HEARTBEAT_SCHEMA = "io.github.mplummeridge.codexbar_mqtt.heartbeat.v1"
 
 STORAGE_VERSION = 1
 STORAGE_SAVE_DELAY_SECONDS = 5
