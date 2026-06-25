@@ -1,0 +1,85 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "SemVer without the v prefix"
+        required: true
+        default: "0.2.0"
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_EVENT_NAME" == "push" ]]; then
+            version="${GITHUB_REF_NAME#v}"
+            tag="$GITHUB_REF_NAME"
+          else
+            version="${{ inputs.version }}"
+            tag="v$version"
+          fi
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+      - name: Validate source
+        run: |
+          python -m compileall custom_components/codexbar_fleet
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for path in Path('.').rglob('*.json'):
+              json.loads(path.read_text())
+          PY
+      - name: Build HACS archive
+        run: |
+          mkdir -p dist
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZIP_DEFLATED, ZipFile
+          out = Path('dist/codexbar_fleet.zip')
+          with ZipFile(out, 'w', ZIP_DEFLATED) as zf:
+              for path in sorted(Path('custom_components/codexbar_fleet').rglob('*')):
+                  if path.is_file() and '__pycache__' not in path.parts and path.suffix != '.pyc':
+                      zf.write(path, path.as_posix())
+          PY
+          (cd dist && sha256sum codexbar_fleet.zip > SHA256SUMS)
+      - name: Attest HACS archive
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: dist/codexbar_fleet.zip
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=("${{ steps.version.outputs.tag }}"
+            dist/codexbar_fleet.zip
+            dist/SHA256SUMS
+            --generate-notes
+            --title "CodexBar Fleet ${{ steps.version.outputs.version }}")
+          if [[ "$GITHUB_EVENT_NAME" == "push" ]]; then
+            args+=(--verify-tag)
+          else
+            args+=(--target "$GITHUB_SHA")
+          fi
+          gh release create "${args[@]}"
