@@ -5,17 +5,24 @@ on:
     branches: [main]
     paths:
       - ".bootstrap/ready"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".bootstrap/ready-pr"
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
   import-source:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref_name }}
       - name: Reconstruct and verify source archive
         shell: bash
         run: |
@@ -33,4 +40,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "feat: import Home Assistant integration source"
-          git push
+          git push origin "HEAD:${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref_name }}"
