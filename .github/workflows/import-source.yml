@@ -1,0 +1,36 @@
+name: Import prepared source
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".bootstrap/ready"
+
+permissions:
+  contents: write
+
+jobs:
+  import-source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Reconstruct and verify source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .bootstrap/source.b64.part-* | tr -d '\n' | base64 --decode > /tmp/ha-codexbar-fleet-source.tar.gz
+          echo "522df23d6d3baff1d4d57665d19f79cd9a5152c048d150465bf797b79107bb34  /tmp/ha-codexbar-fleet-source.tar.gz" | sha256sum -c -
+      - name: Import source and remove bootstrap transport
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -xzf /tmp/ha-codexbar-fleet-source.tar.gz
+          rm -rf .bootstrap
+          rm -f .github/workflows/import-source.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "feat: import Home Assistant integration source"
+          git push
